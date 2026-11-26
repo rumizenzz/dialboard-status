@@ -2,10 +2,20 @@
 // can't be turned back into an email and a link can't be made up.
 import crypto from 'node:crypto';
 
+// (2026-11-25) no one ever handles this value: SUBSCRIBE_SECRET when set, else a random one the site makes for itself the first
+// time and keeps in its own private store (Netlify Blobs), the same for every function from then on
+let SECRET = (process.env.SUBSCRIBE_SECRET || '').trim();
+if (SECRET.length < 32) {
+  try {
+    const { getStore } = await import('@netlify/blobs');
+    const st = getStore({ name: 'status-secret', consistency: 'strong' });
+    SECRET = (await st.get('subscribe')) || '';
+    if (SECRET.length < 32) { await st.set('subscribe', crypto.randomBytes(32).toString('hex'), { onlyIfNew: true }); SECRET = (await st.get('subscribe')) || ''; }
+  } catch (e) { SECRET = ''; }
+}
 function secret() {
-  const s = (process.env.SUBSCRIBE_SECRET || '').trim();
-  if (s.length < 32) throw new Error('SUBSCRIBE_SECRET missing');
-  return s;
+  if (SECRET.length < 32) throw new Error('SUBSCRIBE_SECRET missing');
+  return SECRET;
 }
 const mac = (s) => crypto.createHmac('sha256', secret()).update(s).digest('base64url');
 const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && crypto.timingSafeEqual(x, y); };
