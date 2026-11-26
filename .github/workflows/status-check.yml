@@ -8,14 +8,17 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+  actions: write   # (to start the next check itself: GitHub's 5-minute schedule never started on this repo)
 concurrency:
   group: status-check
   cancel-in-progress: false
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 9
     steps:
+      - name: Note the start
+        run: echo "START_AT=$(date +%s)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -37,3 +40,14 @@ jobs:
           git commit -q -m "status $(date -u +%Y-%m-%dT%H:%MZ)"
           # one commit, replaced every run: the history lives inside the JSON (90 days), so the repo never grows
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" status-data:status-data
+      # ((2026-11-26) the chain: GitHub's schedule never started here (a run every 5 minutes started by hand begins within
+      # seconds), so each run starts the next one 5 minutes after it began. The concurrency group above keeps at most one
+      # waiting run, so the schedule (kept as a restart if the chain ever breaks) never makes a second chain.
+      - name: Start the next check in 5 minutes
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          left=$(( 300 - ($(date +%s) - ${START_AT:-$(date +%s)}) ))
+          [ "$left" -gt 0 ] && sleep "$left"
+          gh workflow run status-check.yml --ref main -R "${{ github.repository }}"
