@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialboard Status</title>
+<meta name="description" content="Is Dialboard working right now? Checked automatically every 5 minutes.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ddd6cb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1e1f22" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Dialboard status" href="/feed.xml">
+<link rel="preload" href="/fonts/permanent-marker-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#parts">Skip to the five parts</a>
+<header class="top">
+  <a class="brand" href="https://dialboard.io" aria-label="Dialboard home">
+    <img src="/favicon.svg" alt="" width="30" height="30"><span class="brand-word">Dialboard</span><span class="brand-sub">status</span>
+  </a>
+  <a class="back" href="https://dialboard.io" data-w="back">Go to dialboard.io ›</a>
+</header>
+
+<main>
+  <section class="board banner" id="banner" data-state="unknown" aria-live="polite">
+    <h1 class="headline" id="headline">Status unknown right now.</h1>
+    <p class="sub" id="banner-sub">Checking…</p>
+    <p class="meta"><span id="last-checked"></span> <span class="auto" data-w="autoLine"></span></p>
+    <noscript><p class="sub">This page needs JavaScript to show the live status. The <a href="/feed.xml">RSS feed</a> works without it.</p></noscript>
+    <div id="open-incidents"></div>
+  </section>
+
+  <section class="board parts" id="parts" aria-labelledby="parts-title">
+    <div class="parts-head">
+      <h2 id="parts-title">The five parts of Dialboard</h2>
+      <p class="zone" id="zone"></p>
+    </div>
+    <ul class="part-list" id="part-list"></ul>
+    <ul class="legend" id="legend" aria-label="What the colours mean"></ul>
+    <p class="disagree"><a href="https://dialboard.io/help" data-w="disagree"></a></p>
+  </section>
+
+  <section class="board past" aria-labelledby="past-title">
+    <h2 id="past-title" data-w="pastTitle"></h2>
+    <div id="past"></div>
+  </section>
+
+  <div class="two">
+    <section class="card services" aria-labelledby="svc-title">
+      <h2 id="svc-title" data-w="servicesTitle"></h2>
+      <ul id="services"></ul>
+      <p class="small" data-w="servicesNote"></p>
+    </section>
+
+    <section class="sticky subscribe" aria-labelledby="sub-title">
+      <h2 id="sub-title" data-w="subTitle"></h2>
+      <p class="small" data-w="subNote"></p>
+      <form id="sub-form" novalidate>
+        <label class="vh" for="sub-email">Your email</label>
+        <input id="sub-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" placeholder="you@company.com" required>
+        <span class="hp" aria-hidden="true"><label for="sub-website">Leave this empty</label><input id="sub-website" name="website" tabindex="-1" autocomplete="off"></span>
+        <button type="submit" data-w="subButton"></button>
+      </form>
+      <p class="sub-msg" id="sub-msg" role="status"></p>
+      <p class="small"><a href="/feed.xml" class="rss" data-w="rss"></a></p>
+    </section>
+  </div>
+
+  <details class="card how">
+    <summary data-w="howTitle"></summary>
+    <ul id="how"></ul>
+  </details>
+</main>
+
+<footer class="foot">
+  <a href="https://dialboard.io" data-w="back"></a>
+  <a href="https://dialboard.io/help" data-w="help"></a>
+  <a href="https://dialboard.io/privacy" data-w="privacy"></a>
+  <span data-w="stillStuck"></span>
+</footer>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "dialboard-status",
+  "private": true,
+  "type": "module",
+  "description": "status.dialboard.io: the page, its checker and its email functions",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "check": "node checker/run.mjs data",
+    "test": "node tests/sim.test.mjs && node tests/functions.test.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

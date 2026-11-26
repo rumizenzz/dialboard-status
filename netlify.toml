@@ -1,0 +1,38 @@
+# status.dialboard.io: its own Netlify site (separate from the dial-board app site), deployed from the
+# rumizenzz/dialboard-status repo's main branch. Static page in site/, functions in netlify/functions/.
+[build]
+  publish = "site"
+  command = "echo static"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/confirm"
+  to = "/confirm.html"
+  status = 200
+
+[[redirects]]
+  from = "/unsubscribe"
+  to = "/unsubscribe.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
