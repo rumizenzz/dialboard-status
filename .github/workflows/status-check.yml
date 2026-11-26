@@ -1,0 +1,39 @@
+# The status checker. Every 5 minutes (GitHub's shortest schedule; runs can start a few minutes late when GitHub is busy,
+# which is why the page only turns grey after 20 minutes without news). Needs NO secrets: everything it checks is public
+# or answered by the probe function inside Supabase. It only needs permission to push the status-data branch.
+name: status-check
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: status-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Get the last results
+        run: |
+          git fetch --depth=1 origin status-data:status-data 2>/dev/null || true
+          mkdir -p data
+          if git rev-parse --verify -q status-data >/dev/null; then git --work-tree=data checkout status-data -- . ; git reset -q; fi
+      - name: Check Dialboard
+        run: node checker/run.mjs data
+      - name: Publish the results
+        run: |
+          cd data
+          git init -q -b status-data
+          git config user.name "dialboard-status"
+          git config user.email "status@dialboard.io"
+          git add -A
+          git commit -q -m "status $(date -u +%Y-%m-%dT%H:%MZ)"
+          # one commit, replaced every run: the history lives inside the JSON (90 days), so the repo never grows
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" status-data:status-data
