@@ -49,5 +49,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           left=$(( 300 - ($(date +%s) - ${START_AT:-$(date +%s)}) ))
-          [ "$left" -gt 0 ] && sleep "$left"
+          if [ "$left" -gt 0 ]; then sleep "$left"; fi
           gh workflow run status-check.yml --ref main -R "${{ github.repository }}"
